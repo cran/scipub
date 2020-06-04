@@ -57,6 +57,11 @@
 #'   var_names = c("Age (months)", "Sex", "Height (inches)", "Depression T"),
 #'   strata = "Income", stars = "name", p_col = FALSE
 #' )
+#' tmp <- FullTable1(data = psydat,
+#'   vars = c("Age", "Height", "depressT"), strata = "Sex")
+#'   tmp$caption <- "Write your own caption"
+#'   #print(htmlTable(x$table, useViewer=T, rnames=F,caption=x$caption, pos.caption="bottom"))
+
 FullTable1 <- function(data, strata = NULL, vars = NULL,
                        var_names = vars, factor_vars = NULL,
                        round_n = 2, es_col = c(TRUE, FALSE),
@@ -184,7 +189,7 @@ FullTable1 <- function(data, strata = NULL, vars = NULL,
 
 
 
-  # create sub-function
+  ### create sub-function ###
   grouptests <- function(datafile, groupvar, outcome, ...) {
     perc <- NULL
     y <- datafile[[outcome]]
@@ -209,16 +214,15 @@ FullTable1 <- function(data, strata = NULL, vars = NULL,
       tableout[, grplvl] <- as.data.frame(t((datafile %>%
         dplyr::group_by_at(groupvar) %>%
         dplyr::select_at(outcome) %>%
-        dplyr::summarise_all(list(
-          mean = mean,
-          sd = stats::sd
-        ), na.rm = TRUE) %>%
+        dplyr::summarise(sd = sd(.data[[outcome]], na.rm = T),
+                         mean = mean(.data[[outcome]], na.rm = T),
+                         .groups = 'drop') %>%
         dplyr::mutate_at(c("mean", "sd"), round, round_n) %>%
         tidyr::unite("col", mean, sd, sep = " (") %>%
         dplyr::mutate(col = stringr::str_c(col, ")")))[2]))
 
       # IF 2 LEVEL
-      if (length(levels(x)) == 2 & groupvar != "onecol") {
+      if (groupvar != "onecol" & sum(table(x, !is.na(y))[, "TRUE"] > 0) == 2) {
         testtype <- ifelse(type == "mixed", "t=", "")
         # calcualte t-test & p-value
         tableout$Stat <- paste0(testtype,
@@ -237,15 +241,16 @@ FullTable1 <- function(data, strata = NULL, vars = NULL,
           (datafile %>%
             dplyr::group_by_at(groupvar) %>%
             dplyr::select_at(outcome) %>%
-            dplyr::summarise_all(list(mean = mean, sd = stats::sd),
-              na.rm = TRUE
-            ) %>%
+             dplyr::summarise(sd = sd(.data[[outcome]], na.rm = T),
+                              mean = mean(.data[[outcome]], na.rm = T),
+                              .groups = 'drop') %>%
+             tidyr::drop_na() %>%
             dplyr::mutate(d = (mean[2] - mean[1]) /
               (sqrt((sd[2]^2 + sd[1]^2) / 2))))[[1, "d"]],
           round_n
         ), nsmall = round_n))
         # IF MORE THAN 2 LEVELS
-      } else if (length(levels(x)) > 2 & groupvar != "onecol") {
+      } else if (groupvar != "onecol" & sum(table(x, !is.na(y))[, "TRUE"] > 0) > 2) {
         testtype <- ifelse(type == "mixed", "F=", "")
         # calcualte anova & p-value
         tableout$Stat <- paste0(testtype,
@@ -311,7 +316,7 @@ FullTable1 <- function(data, strata = NULL, vars = NULL,
 
 
         # calculate effect size - odds ratio
-        if (length(levels(x)) == 2 & groupvar != "onecol") {
+        if (sum(table(x, !is.na(y))[, "TRUE"] > 0) == 2 & groupvar != "onecol") {
           estype <- ifelse(type == "mixed", "OR=", "")
           tableout$es <- paste0(
             estype,
@@ -319,7 +324,7 @@ FullTable1 <- function(data, strata = NULL, vars = NULL,
               nsmall = round_n
             )
           )
-        } else if (length(levels(x)) > 2 & groupvar != "onecol") {
+        } else if (sum(table(x, !is.na(y))[, "TRUE"] > 0) > 2 & groupvar != "onecol") {
           # calculate effect size - cramer v
           estype <- ifelse(type == "mixed", "V=", "")
           tableout$es <- paste0(
@@ -367,7 +372,7 @@ FullTable1 <- function(data, strata = NULL, vars = NULL,
     }
 
     # set p for all test types
-    if (groupvar != "onecol") {
+    if (groupvar != "onecol" & !is.null(p)) {
       tableout$sig[1] <- ifelse(p < .001, "***",
         ifelse(p < .01, "**", ifelse(p < .05, "*", ""))
       )
@@ -396,7 +401,8 @@ FullTable1 <- function(data, strata = NULL, vars = NULL,
     function(x) {
       grouptests(
         datafile = data_edit,
-        groupvar = strata, outcome = x
+        groupvar = strata,
+        outcome = x
       )
     }
   ))
@@ -427,6 +433,10 @@ FullTable1 <- function(data, strata = NULL, vars = NULL,
     finaltable <- finaltable %>% dplyr::select(-c(sig))
   }
 
+
+  # remove missing cells
+  finaltable[is.na(finaltable)] <- "-"
+  finaltable[finaltable == "NaN (NA)"] <- "-"
 
   # caption
   missing_n <- data_edit %>%

@@ -5,6 +5,7 @@ knitr::opts_chunk$set(
 )
 library(knitr)
 library(ggplot2)
+library(htmlTable)
 
 ## ---- message = FALSE,include = TRUE------------------------------------------
 library(scipub)
@@ -37,6 +38,15 @@ correltable(data = psydat, vars = c("Age", "Height", "iq"), var_names = c("Age (
 correltable(data = psydat, html=TRUE)
 
 ## ----results="asis"-----------------------------------------------------------
+partial_correltable(data = psydat, vars = c("Age", "Height", "iq"), partialvars = c("Sex", "Income"), tri = "lower", html = TRUE)
+
+## ----results="asis"-----------------------------------------------------------
+partial_correltable(data = psydat, vars = c("Age", "Height", "iq"), var_names = c("Age (months)", "Height (inches)", "IQ"), partialvars = c("Sex", "Income"),tri = "upper", colnum = TRUE, html = TRUE)
+
+## ----results="asis"-----------------------------------------------------------
+partial_correltable(data = psydat, vars = c("Age", "Height", "iq"), var_names = c("Age (months)", "Height (inches)", "IQ"), partialvars = c("Sex", "Income"),tri = "upper", method = "spearman", use = "complete", cutempty = TRUE, colnum = TRUE, html = TRUE)
+
+## ----results="asis"-----------------------------------------------------------
 FullTable1(data = psydat, vars = c("Age", "Sex","Height", "depressT"),  html=TRUE)
 
 ## ----results="asis"-----------------------------------------------------------
@@ -47,6 +57,12 @@ FullTable1(data = psydat, vars = c("Age", "Sex","Height", "depressT"), var_names
 
 ## ----results="asis"-----------------------------------------------------------
 FullTable1(data = psydat, strata = "Sex",stars = "name",p_col = FALSE, html=TRUE)
+
+## ----results="asis"-----------------------------------------------------------
+tmp <- FullTable1(data = psydat,
+   vars = c("Age", "Height", "depressT"), strata = "Sex")
+   tmp$caption <- "Write your own caption"
+   print(htmlTable::htmlTable(tmp$table, useViewer=T, rnames=F,caption=tmp$caption, pos.caption="bottom"))
 
 ## ----results="asis"-----------------------------------------------------------
 temp <- data.frame(iq=psydat$iq, iq_winsor=winsorZ(psydat$iq), iq_outlier = winsorZ_find(psydat$iq))

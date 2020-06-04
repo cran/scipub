@@ -1,779 +1,1546 @@
 <!DOCTYPE html>
+
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title><code>apastat</code></title>
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<script type="text/javascript">
-window.onload = function() {
-  var imgs = document.getElementsByTagName('img'), i, img;
-  for (i = 0; i < imgs.length; i++) {
-    img = imgs[i];
-    // center an image if it is the only element of its parent
-    if (img.parentElement.childElementCount === 1)
-      img.parentElement.style.textAlign = 'center';
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="David Pagliaccio" />
+
+<meta name="date" content="2020-06-03" />
+
+<title>scipub vignette</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
   }
-};
-</script>
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 
-<!-- Styles for R syntax highlighter -->
-<style type="text/css">
-   pre .operator,
-   pre .paren {
-     color: rgb(104, 118, 135)
-   }
-
-   pre .literal {
-     color: #990073
-   }
-
-   pre .number {
-     color: #099;
-   }
-
-   pre .comment {
-     color: #998;
-     font-style: italic
-   }
-
-   pre .keyword {
-     color: #900;
-     font-weight: bold
-   }
-
-   pre .identifier {
-     color: rgb(0, 0, 0);
-   }
-
-   pre .string {
-     color: #d14;
-   }
 </style>
-
-<!-- R syntax highlighter -->
-<script type="text/javascript">
-var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
-hljs.initHighlightingOnLoad();
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
 </script>
 
 
 
-<style type="text/css">
-body, td {
-   font-family: sans-serif;
-   background-color: white;
-   font-size: 13px;
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
 }
-
-body {
-  max-width: 800px;
-  margin: auto;
-  padding: 1em;
-  line-height: 20px;
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
 }
-
-tt, code, pre {
-   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
 }
-
-h1 {
-   font-size:2.2em;
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
 }
-
-h2 {
-   font-size:1.8em;
+#TOC ul ul {
+margin-left: -2em;
 }
-
-h3 {
-   font-size:1.4em;
+#TOC li {
+line-height: 16px;
 }
-
-h4 {
-   font-size:1.0em;
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
 }
-
-h5 {
-   font-size:0.9em;
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
 }
-
-h6 {
-   font-size:0.8em;
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
 }
-
-a:visited {
-   color: rgb(50%, 0%, 50%);
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
 }
-
-pre, img {
-  max-width: 100%;
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
 }
 pre {
-  overflow-x: auto;
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
 }
-pre code {
-   display: block; padding: 0.5em;
+pre:not([class]) {
+background-color: #f7f7f7;
 }
-
 code {
-  font-size: 92%;
-  border: 1px solid #ccc;
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
 }
-
-code[class] {
-  background-color: #F8F8F8;
+p > code, li > code {
+padding: 2px 0px;
 }
-
-table, td, th {
-  border: none;
+div.figure {
+text-align: center;
 }
-
-blockquote {
-   color:#666666;
-   margin:0;
-   padding-left: 1em;
-   border-left: 0.5em #EEE solid;
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
 }
-
-hr {
-   height: 0px;
-   border-bottom: none;
-   border-top-width: thin;
-   border-top-style: dotted;
-   border-top-color: #999999;
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
 }
-
-@media print {
-   * {
-      background: transparent !important;
-      color: black !important;
-      filter:none !important;
-      -ms-filter: none !important;
-   }
-
-   body {
-      font-size:12pt;
-      max-width:100%;
-   }
-
-   a, a:visited {
-      text-decoration: underline;
-   }
-
-   hr {
-      visibility: hidden;
-      page-break-before: always;
-   }
-
-   pre, blockquote {
-      padding-right: 1em;
-      page-break-inside: avoid;
-   }
-
-   tr, img {
-      page-break-inside: avoid;
-   }
-
-   img {
-      max-width: 100% !important;
-   }
-
-   @page :left {
-      margin: 15mm 20mm 15mm 10mm;
-   }
-
-   @page :right {
-      margin: 15mm 10mm 15mm 20mm;
-   }
-
-   p, h2, h3 {
-      orphans: 3; widows: 3;
-   }
-
-   h2, h3 {
-      page-break-after: avoid;
-   }
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
 }
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
+
 
 
 
 </head>
 
 <body>
-<p>The scipub package contains functions for summarizing data
-    for scientific publication. This includes making a &ldquo;Table 1&rdquo;
-    to summarize demographics across groups, correlation tables
-    with significance indicated by stars, and extracting formatted
-    statistical summarizes from simple tests for in-text notation.
-    The package also includes functions for Winsorizing data based
-    on a Z-statistic cutoff.<br/>
-The sample dataset of demographic and clinical data
- from 5,000 children is used for examples.  </p>
 
-<hr/>
 
-<p>We&#39;ll start by loading scipub:</p>
 
-<pre><code class="r">library(scipub)
-</code></pre>
 
-<hr/>
+<h1 class="title toc-ignore">scipub vignette</h1>
+<h4 class="author">David Pagliaccio</h4>
+<h4 class="date">2020-06-03</h4>
 
+
+
+<p>The scipub package contains functions for summarizing data for scientific publication. This includes making a “Table 1” to summarize demographics across groups, correlation tables with significance indicated by stars, and extracting formatted statistical summarizes from simple tests for in-text notation. The package also includes functions for Winsorizing data based on a Z-statistic cutoff.<br />
+The sample dataset of demographic and clinical data from 5,000 children is used for examples.</p>
+<hr />
+<p>We’ll start by loading scipub:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(scipub)</a></code></pre></div>
+<hr />
+<div id="apastat" class="section level2">
 <h2><code>apastat</code></h2>
-
-<p>The <code>apastat</code> function summarizes simple statistical tests to include 
-in the text of an article, typically in a parenthetical. 
-This is built for t-tests, correlations, ANOVA, and regression.
-Regressions can be summarized by their overall model fit or the
-parameter estimates for one predictor variable.
-Effect sizes are calculated where possible (default: <code>es=TRUE</code>). 
-For example:</p>
-
-<p>There is a significant positive correlation between age and height. 
-95% confidence intervals are requested.</p>
-
-<pre><code class="r">apastat(stats::cor.test(psydat$Age, psydat$Height), ci = TRUE)
-#&gt; r=.41, t(4991)=32.06, 95% CI=[.39,.44], p&lt;.001
-</code></pre>
-
+<p>The <code>apastat</code> function summarizes simple statistical tests to include in the text of an article, typically in a parenthetical. This is built for t-tests, correlations, ANOVA, and regression. Regressions can be summarized by their overall model fit or the parameter estimates for one predictor variable. Effect sizes are calculated where possible (default: <code>es=TRUE</code>). For example:</p>
+<p>There is a significant positive correlation between age and height. 95% confidence intervals are requested.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">apastat</span>(stats<span class="op">::</span><span class="kw">cor.test</span>(psydat<span class="op">$</span>Age, psydat<span class="op">$</span>Height), <span class="dt">ci =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; r=.41, t(4991)=32.06, 95% CI=[.39,.44], p&lt;.001</span></a></code></pre></div>
 <p>There is no significant sex difference in height in the sample.</p>
-
-<pre><code class="r">apastat(stats::t.test(Height ~ Sex, data = psydat))
-#&gt; t(4855.74)=0.83, p=.41, d=0.02 t(4855.74)=0.83, p=.41
-</code></pre>
-
-<p>A linear regression model predicting height was highly significant, with the predictors (age and sex) accounting for about 17% of the variance in height. </p>
-
-<pre><code class="r">apastat(stats::lm(data = psydat, Height ~ Age + Sex))
-#&gt; N=4991, F(2,4988)=517.49, R2=.17, adj. R2=.17, p&lt;.001
-</code></pre>
-
-<p>In this linear regression model, age was a highly significant predictor of height, controlling for sex. </p>
-
-<pre><code class="r">apastat(stats::lm(data = psydat, Height ~ Age + Sex), var = &quot;Age&quot;)
-#&gt; N=4991, b=0.18, t(4988)=32.16, p&lt;.001 N=4991, b=0.18, t(4988)=32.16, p&lt;.001
-</code></pre>
-
-<hr/>
-
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">apastat</span>(stats<span class="op">::</span><span class="kw">t.test</span>(Height <span class="op">~</span><span class="st"> </span>Sex, <span class="dt">data =</span> psydat))</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; t(4855.74)=0.83, p=.41, d=0.02</span></a></code></pre></div>
+<p>A linear regression model predicting height was highly significant, with the predictors (age and sex) accounting for about 17% of the variance in height.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">apastat</span>(stats<span class="op">::</span><span class="kw">lm</span>(<span class="dt">data =</span> psydat, Height <span class="op">~</span><span class="st"> </span>Age <span class="op">+</span><span class="st"> </span>Sex))</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; N=4991, F(2,4988)=517.49, R2=.17, adj. R2=.17, p&lt;.001</span></a></code></pre></div>
+<p>In this linear regression model, age was a highly significant predictor of height, controlling for sex.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">apastat</span>(stats<span class="op">::</span><span class="kw">lm</span>(<span class="dt">data =</span> psydat, Height <span class="op">~</span><span class="st"> </span>Age <span class="op">+</span><span class="st"> </span>Sex), <span class="dt">var =</span> <span class="st">&quot;Age&quot;</span>)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; N=4991, b=0.18, t(4988)=32.16, p&lt;.001</span></a></code></pre></div>
+<hr />
+</div>
+<div id="correltable" class="section level2">
 <h2><code>correltable</code></h2>
-
-<p>The <code>correltable</code> function creates a summary correlation table with asterisks to indicate significance. 
-Variables can be renamed as part of the function call. The full matrix or upper/lower triangle can be selected for output. For the selected triangle, the empty row/column can be kept or deleted as needed. 
-The caption provides information on the statistics included, any missing data, and the * indications. 
-For example:</p>
-
+<p>The <code>correltable</code> function creates a summary correlation table with asterisks to indicate significance. Variables can be renamed as part of the function call. The full matrix or upper/lower triangle can be selected for output. For the selected triangle, the empty row/column can be kept or deleted as needed. The caption provides information on the statistics included, any missing data, and the * indications. For example:</p>
 <p>The lower triangle of inter-correlation among the age, height, and iq variables are shown.</p>
-
-<pre><code class="r">correltable(data = psydat, vars = c(&quot;Age&quot;, &quot;Height&quot;, &quot;iq&quot;),tri=&quot;lower&quot;,html=TRUE)
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">correltable</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;iq&quot;</span>),<span class="dt">tri=</span><span class="st">&quot;lower&quot;</span>,<span class="dt">html=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey;'> </th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Age</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Height</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>iq</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey;">
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Age
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Height
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+iq
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: left;'>Age</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
+<td style="text-align: left;">
+Age
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>Height</td>
-<td style='text-align: center;'>.41***</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
+<td style="text-align: left;">
+Height
+</td>
+<td style="text-align: center;">
+.41***
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
 </tr>
 <tr>
-<td style='border-bottom: 2px solid grey; text-align: left;'>iq</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>.09***</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>.04*</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+iq
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+.09***
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+.04*
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
 </tr>
 </tbody>
-<tr><td colspan='4' style='text-align: left;'>
-Note. This table presents Pearson correlation coefficients with pairwise deletion. N=7 missing Height. N=179 missing iq.  * p<.05, ** p<.01, *** p<.001</td></tr>
+<tr>
+<td colspan="4" style="text-align: left;">
+Note. This table presents Pearson correlation coefficients with pairwise deletion. N=7 missing Height. N=179 missing iq. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
 </table>
-
-<p>These same variables can be relabeled in the output and, for conciseness, the columns can be indicated by corresponding number rather than variable name. </p>
-
-<pre><code class="r">correltable(data = psydat, vars = c(&quot;Age&quot;, &quot;Height&quot;, &quot;iq&quot;), var_names = c(&quot;Age (months)&quot;, &quot;Height (inches)&quot;, &quot;IQ&quot;), tri = &quot;upper&quot;, colnum = TRUE,html=TRUE)
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<p>These same variables can be relabeled in the output and, for conciseness, the columns can be indicated by corresponding number rather than variable name.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">correltable</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;iq&quot;</span>), <span class="dt">var_names =</span> <span class="kw">c</span>(<span class="st">&quot;Age (months)&quot;</span>, <span class="st">&quot;Height (inches)&quot;</span>, <span class="st">&quot;IQ&quot;</span>), <span class="dt">tri =</span> <span class="st">&quot;upper&quot;</span>, <span class="dt">colnum =</span> <span class="ot">TRUE</span>,<span class="dt">html=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey;'> </th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>1</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>2</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>3</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey;">
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+1
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+2
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+3
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: left;'>1. Age (months)</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>.41***</td>
-<td style='text-align: center;'>.09***</td>
+<td style="text-align: left;">
+<ol style="list-style-type: decimal">
+<li>Age (months)
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+.41***
+</td>
+<td style="text-align: center;">
+.09***
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>2. Height (inches)</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>.04*</td>
+<td style="text-align: left;">
+<ol start="2" style="list-style-type: decimal">
+<li>Height (inches)
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+.04*
+</td>
 </tr>
 <tr>
-<td style='border-bottom: 2px solid grey; text-align: left;'>3. IQ</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+<ol start="3" style="list-style-type: decimal">
+<li>IQ
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
 </tr>
 </tbody>
-<tr><td colspan='4' style='text-align: left;'>
-Note. This table presents Pearson correlation coefficients with pairwise deletion. N=7 missing Height (inches). N=179 missing IQ.  * p<.05, ** p<.01, *** p<.001</td></tr>
-</table>
-
-<p>This can also be done with Spearman correlation. As well as using only complete data (list-wise deletion). And, the empty row/column can be removed if desired. </p>
-
-<pre><code class="r">correltable(data = psydat, vars = c(&quot;Age&quot;, &quot;Height&quot;, &quot;iq&quot;), var_names = c(&quot;Age (months)&quot;, &quot;Height (inches)&quot;, &quot;IQ&quot;), tri = &quot;upper&quot;, method = &quot;spearman&quot;, use = &quot;complete&quot;, cutempty = TRUE, colnum = TRUE,html=TRUE)
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<tr>
+<td colspan="4" style="text-align: left;">
+Note. This table presents Pearson correlation coefficients with pairwise deletion. N=7 missing Height (inches). N=179 missing IQ. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
+</table></li>
+</ol></li>
+</ol></li>
+</ol>
+<p>This can also be done with Spearman correlation. As well as using only complete data (list-wise deletion). And, the empty row/column can be removed if desired.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">correltable</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;iq&quot;</span>), <span class="dt">var_names =</span> <span class="kw">c</span>(<span class="st">&quot;Age (months)&quot;</span>, <span class="st">&quot;Height (inches)&quot;</span>, <span class="st">&quot;IQ&quot;</span>), <span class="dt">tri =</span> <span class="st">&quot;upper&quot;</span>, <span class="dt">method =</span> <span class="st">&quot;spearman&quot;</span>, <span class="dt">use =</span> <span class="st">&quot;complete&quot;</span>, <span class="dt">cutempty =</span> <span class="ot">TRUE</span>, <span class="dt">colnum =</span> <span class="ot">TRUE</span>,<span class="dt">html=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey;'> </th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>2</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>3</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey;">
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+2
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+3
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: left;'>1. Age (months)</td>
-<td style='text-align: center;'>.43***</td>
-<td style='text-align: center;'>.08***</td>
+<td style="text-align: left;">
+<ol style="list-style-type: decimal">
+<li>Age (months)
+</td>
+<td style="text-align: center;">
+.43***
+</td>
+<td style="text-align: center;">
+.08***
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>2. Height (inches)</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>.04*</td>
-</tr>
-<tr>
-<td style='border-bottom: 2px solid grey; text-align: left;'>3. IQ</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+<ol start="2" style="list-style-type: decimal">
+<li>Height (inches)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+.04*
+</td>
 </tr>
 </tbody>
-<tr><td colspan='3' style='text-align: left;'>
-Note. This table presents Spearman correlation coefficients with list-wise deletion (N=4816, missing 184 cases) * p<.05, ** p<.01, *** p<.001</td></tr>
-</table>
-
-<p>The inter-correlation between two sets of variables can also be shown. </p>
-
-<pre><code class="r">correltable(data = psydat, vars = c(&quot;Age&quot;, &quot;Height&quot;, &quot;iq&quot;), var_names = c(&quot;Age (months)&quot;, &quot;Height (inches)&quot;, &quot;IQ&quot;), vars2 = c(&quot;depressT&quot;, &quot;anxT&quot;), var_names2 = c(&quot;Depression T&quot;, &quot;Anxiety T&quot;),html=TRUE)
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<tr>
+<td colspan="3" style="text-align: left;">
+Note. This table presents Spearman correlation coefficients with list-wise deletion (N=4816, missing 184 cases) * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
+</table></li>
+</ol></li>
+</ol>
+<p>The inter-correlation between two sets of variables can also be shown.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">correltable</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;iq&quot;</span>), <span class="dt">var_names =</span> <span class="kw">c</span>(<span class="st">&quot;Age (months)&quot;</span>, <span class="st">&quot;Height (inches)&quot;</span>, <span class="st">&quot;IQ&quot;</span>), <span class="dt">vars2 =</span> <span class="kw">c</span>(<span class="st">&quot;depressT&quot;</span>, <span class="st">&quot;anxT&quot;</span>), <span class="dt">var_names2 =</span> <span class="kw">c</span>(<span class="st">&quot;Depression T&quot;</span>, <span class="st">&quot;Anxiety T&quot;</span>),<span class="dt">html=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey;'> </th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Depression T</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Anxiety T</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey;">
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Depression T
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Anxiety T
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: left;'>Age (months)</td>
-<td style='text-align: center;'>.02</td>
-<td style='text-align: center;'>-.01</td>
+<td style="text-align: left;">
+Age (months)
+</td>
+<td style="text-align: center;">
+.02
+</td>
+<td style="text-align: center;">
+-.01
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>Height (inches)</td>
-<td style='text-align: center;'>-.01</td>
-<td style='text-align: center;'>-.01</td>
+<td style="text-align: left;">
+Height (inches)
+</td>
+<td style="text-align: center;">
+-.01
+</td>
+<td style="text-align: center;">
+-.01
+</td>
 </tr>
 <tr>
-<td style='border-bottom: 2px solid grey; text-align: left;'>IQ</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>-.08***</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>-.06***</td>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+IQ
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+-.08***
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+-.06***
+</td>
 </tr>
 </tbody>
-<tr><td colspan='3' style='text-align: left;'>
-Note. This table presents Pearson correlation coefficients with pairwise deletion. N=7 missing Height (inches). N=179 missing IQ. N=8 missing Depression T. N=8 missing Anxiety T.  * p<.05, ** p<.01, *** p<.001</td></tr>
+<tr>
+<td colspan="3" style="text-align: left;">
+Note. This table presents Pearson correlation coefficients with pairwise deletion. N=7 missing Height (inches). N=179 missing IQ. N=8 missing Depression T. N=8 missing Anxiety T. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
 </table>
-
 <p>The simplest call just correlates all variables in a dataset. Any non-numeric variables will be tested by t-test, chi-squared, or ANOVA as appropriate.</p>
-
-<pre><code class="r">correltable(data = psydat, html=TRUE)
-#&gt; Warning: Converting non-numeric columns to factor: Sex,Income
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">correltable</span>(<span class="dt">data =</span> psydat, <span class="dt">html=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; Warning: Converting non-numeric columns to factor: Sex,Income</span></a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey;'> </th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Age</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Sex</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Income</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Height</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>iq</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>depressT</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>anxT</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey;">
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Age
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Sex
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Income
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Height
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+iq
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+depressT
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+anxT
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: left;'>Age</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>t=-1.86</td>
-<td style='text-align: center;'>F=4.17*</td>
-<td style='text-align: center;'>.41***</td>
-<td style='text-align: center;'>.09***</td>
-<td style='text-align: center;'>.02</td>
-<td style='text-align: center;'>-.01</td>
+<td style="text-align: left;">
+Age
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+t=-1.86
+</td>
+<td style="text-align: center;">
+F=4.17*
+</td>
+<td style="text-align: center;">
+.41***
+</td>
+<td style="text-align: center;">
+.09***
+</td>
+<td style="text-align: center;">
+.02
+</td>
+<td style="text-align: center;">
+-.01
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>Sex</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>χ2=0.72</td>
-<td style='text-align: center;'>t=0.83</td>
-<td style='text-align: center;'>t=1.25</td>
-<td style='text-align: center;'>t=-4.87***</td>
-<td style='text-align: center;'>t=-5.76***</td>
+<td style="text-align: left;">
+Sex
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+χ2=0.72
+</td>
+<td style="text-align: center;">
+t=0.83
+</td>
+<td style="text-align: center;">
+t=1.25
+</td>
+<td style="text-align: center;">
+t=-4.87***
+</td>
+<td style="text-align: center;">
+t=-5.76***
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>Income</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>F=1.15</td>
-<td style='text-align: center;'>F=364.33***</td>
-<td style='text-align: center;'>F=31.18***</td>
-<td style='text-align: center;'>F=16.26***</td>
+<td style="text-align: left;">
+Income
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+F=1.15
+</td>
+<td style="text-align: center;">
+F=364.33***
+</td>
+<td style="text-align: center;">
+F=31.18***
+</td>
+<td style="text-align: center;">
+F=16.26***
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>Height</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>.04*</td>
-<td style='text-align: center;'>-.01</td>
-<td style='text-align: center;'>-.01</td>
+<td style="text-align: left;">
+Height
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+.04*
+</td>
+<td style="text-align: center;">
+-.01
+</td>
+<td style="text-align: center;">
+-.01
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>iq</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>-.08***</td>
-<td style='text-align: center;'>-.06***</td>
+<td style="text-align: left;">
+iq
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+-.08***
+</td>
+<td style="text-align: center;">
+-.06***
+</td>
 </tr>
 <tr>
-<td style='text-align: left;'>depressT</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>.61***</td>
+<td style="text-align: left;">
+depressT
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+.61***
+</td>
 </tr>
 <tr>
-<td style='border-bottom: 2px solid grey; text-align: left;'>anxT</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
-<td style='border-bottom: 2px solid grey; text-align: center;'></td>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+anxT
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
 </tr>
 </tbody>
-<tr><td colspan='8' style='text-align: left;'>
-Note. This table presents Pearson correlation coefficients with pairwise deletion. N=4 missing Sex. N=404 missing Income. N=7 missing Height. N=179 missing iq. N=8 missing depressT. N=8 missing anxT.  Group differences for continuous and categorical
-             variables are indicated by t-statistic/ANOVA F
-             and chi-squared, respectively. * p<.05, ** p<.01, *** p<.001</td></tr>
+<tr>
+<td colspan="8" style="text-align: left;">
+Note. This table presents Pearson correlation coefficients with pairwise deletion. N=4 missing Sex. N=404 missing Income. N=7 missing Height. N=179 missing iq. N=8 missing depressT. N=8 missing anxT. Group differences for continuous and categorical variables are indicated by t-statistic/ANOVA F and chi-squared, respectively. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
 </table>
-
-<hr/>
-
+<hr />
+</div>
+<div id="partial_correltable" class="section level2">
+<h2><code>partial_correltable</code></h2>
+<p>The <code>partial_correltable</code> function provides similar functionality to <code>correltable</code> but allows for covariates to be partialled out of all correlations. This function will allow for binary/factor covariates to be partialled out but only numeric variables can be correlated. This involves residualizing all <code>vars</code> by all <code>partialvars</code> via linear regression (<code>lm</code>). For example:</p>
+<p>The lower triangle of partial correlations among the age, height, and iq variables are shown, residualizing for sex and income as factor variables.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">partial_correltable</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;iq&quot;</span>), <span class="dt">partialvars =</span> <span class="kw">c</span>(<span class="st">&quot;Sex&quot;</span>, <span class="st">&quot;Income&quot;</span>), <span class="dt">tri =</span> <span class="st">&quot;lower&quot;</span>, <span class="dt">html =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<thead>
+<tr>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey;">
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Age
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Height
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+iq
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">
+Age
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Height
+</td>
+<td style="text-align: center;">
+.42***
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+iq
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+.09***
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+.05***
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+</tr>
+</tbody>
+<tr>
+<td colspan="4" style="text-align: left;">
+Note. This table presents Pearson partial correlation coefficients controlling for Sex, Income with pairwise deletion. N=5 missing Height. N=165 missing iq. N=406 excluded for missing covariates to be partialled out. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
+</table>
+<p>These same variables can be relabeled in the output and, for conciseness, the columns can be indicated by corresponding number rather than variable name and shown in the supper triangle.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">partial_correltable</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;iq&quot;</span>), <span class="dt">var_names =</span> <span class="kw">c</span>(<span class="st">&quot;Age (months)&quot;</span>, <span class="st">&quot;Height (inches)&quot;</span>, <span class="st">&quot;IQ&quot;</span>), <span class="dt">partialvars =</span> <span class="kw">c</span>(<span class="st">&quot;Sex&quot;</span>, <span class="st">&quot;Income&quot;</span>),<span class="dt">tri =</span> <span class="st">&quot;upper&quot;</span>, <span class="dt">colnum =</span> <span class="ot">TRUE</span>, <span class="dt">html =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<thead>
+<tr>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey;">
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+1
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+2
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+3
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">
+<ol style="list-style-type: decimal">
+<li>Age
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+.42***
+</td>
+<td style="text-align: center;">
+.09***
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<ol start="2" style="list-style-type: decimal">
+<li>Height
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+.05***
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+<ol start="3" style="list-style-type: decimal">
+<li>iq
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+</tr>
+</tbody>
+<tr>
+<td colspan="4" style="text-align: left;">
+Note. This table presents Pearson partial correlation coefficients controlling for Sex, Income with pairwise deletion. N=5 missing Height. N=165 missing iq. N=406 excluded for missing covariates to be partialled out. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
+</table></li>
+</ol></li>
+</ol></li>
+</ol>
+<p>This can also be done with Spearman correlation. As well as using only complete data (list-wise deletion). And, the empty row/column can be removed if desired.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">partial_correltable</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;iq&quot;</span>), <span class="dt">var_names =</span> <span class="kw">c</span>(<span class="st">&quot;Age (months)&quot;</span>, <span class="st">&quot;Height (inches)&quot;</span>, <span class="st">&quot;IQ&quot;</span>), <span class="dt">partialvars =</span> <span class="kw">c</span>(<span class="st">&quot;Sex&quot;</span>, <span class="st">&quot;Income&quot;</span>),<span class="dt">tri =</span> <span class="st">&quot;upper&quot;</span>, <span class="dt">method =</span> <span class="st">&quot;spearman&quot;</span>, <span class="dt">use =</span> <span class="st">&quot;complete&quot;</span>, <span class="dt">cutempty =</span> <span class="ot">TRUE</span>, <span class="dt">colnum =</span> <span class="ot">TRUE</span>, <span class="dt">html =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<thead>
+<tr>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey;">
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+2
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+3
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">
+<ol style="list-style-type: decimal">
+<li>Age
+</td>
+<td style="text-align: center;">
+.43***
+</td>
+<td style="text-align: center;">
+.07***
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+<ol start="2" style="list-style-type: decimal">
+<li>Height
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+.05***
+</td>
+</tr>
+</tbody>
+<tr>
+<td colspan="3" style="text-align: left;">
+Note. This table presents Spearman partial correlation coefficients controlling for Sex, Income with list-wise deletion (N=4424, missing 576 cases) * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
+</table></li>
+</ol></li>
+</ol>
+<hr />
+</div>
+<div id="fulltable1" class="section level2">
 <h2><code>FullTable1</code></h2>
-
-<p>A &ldquo;Table 1&rdquo; can be created to summarize data, i.e. the typical first table in a paper that describes the sample characteristics.
-This can display information for a single group for the declared variables .  </p>
-
-<pre><code class="r">FullTable1(data = psydat, vars = c(&quot;Age&quot;, &quot;Sex&quot;,&quot;Height&quot;, &quot;depressT&quot;),  html=TRUE)
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<p>A “Table 1” can be created to summarize data, i.e. the typical first table in a paper that describes the sample characteristics. This can display information for a single group for the declared variables .</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">FullTable1</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Sex&quot;</span>,<span class="st">&quot;Height&quot;</span>, <span class="st">&quot;depressT&quot;</span>),  <span class="dt">html=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Variable</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Sample (N=5000)</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Variable
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Sample (N=5000)
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: center;'>Age</td>
-<td style='text-align: center;'>120.86 (7.59)</td>
+<td style="text-align: center;">
+Age
+</td>
+<td style="text-align: center;">
+120.86 (7.59)
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>Sex (M)</td>
-<td style='text-align: center;'>2632 (52.68%)</td>
+<td style="text-align: center;">
+Sex (M)
+</td>
+<td style="text-align: center;">
+2632 (52.68%)
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>Height</td>
-<td style='text-align: center;'>57.3 (3.37)</td>
+<td style="text-align: center;">
+Height
+</td>
+<td style="text-align: center;">
+57.3 (3.37)
+</td>
 </tr>
 <tr>
-<td style='border-bottom: 2px solid grey; text-align: center;'>depressT</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>55.51 (5.69)</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+depressT
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+55.51 (5.69)
+</td>
 </tr>
 </tbody>
-<tr><td colspan='2' style='text-align: left;'>
-Note. N=4 missing Sex. N=7 missing Height. N=8 missing depressT. </td></tr>
+<tr>
+<td colspan="2" style="text-align: left;">
+Note. N=4 missing Sex. N=7 missing Height. N=8 missing depressT.
+</td>
+</tr>
 </table>
-
 <p>Or commonly this can be shown for two groups if interest including the tests of group difference for all variables.</p>
-
-<pre><code class="r">FullTable1(data = psydat, vars = c(&quot;Age&quot;, &quot;Height&quot;, &quot;depressT&quot;), strata = &quot;Sex&quot;, html=TRUE)
-#&gt; Warning: N=4 missing/NA in grouping variable: Sex
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">FullTable1</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;depressT&quot;</span>), <span class="dt">strata =</span> <span class="st">&quot;Sex&quot;</span>, <span class="dt">html=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="co">#&gt; Warning: N=4 missing/NA in grouping variable: Sex</span></a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Variable</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>F (N=2364)</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>M (N=2632)</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Stat</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>p</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>sig</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>es</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Variable
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+F (N=2364)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+M (N=2632)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Stat
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+p
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+sig
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+es
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: center;'>Age</td>
-<td style='text-align: center;'>120.65 (7.5)</td>
-<td style='text-align: center;'>121.05 (7.66)</td>
-<td style='text-align: center;'>1.86</td>
-<td style='text-align: center;'>.06</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>0.05</td>
+<td style="text-align: center;">
+Age
+</td>
+<td style="text-align: center;">
+120.65 (7.5)
+</td>
+<td style="text-align: center;">
+121.05 (7.66)
+</td>
+<td style="text-align: center;">
+1.86
+</td>
+<td style="text-align: center;">
+.06
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+0.05
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>Height</td>
-<td style='text-align: center;'>57.34 (3.48)</td>
-<td style='text-align: center;'>57.27 (3.28)</td>
-<td style='text-align: center;'>-0.83</td>
-<td style='text-align: center;'>.41</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>-0.02</td>
+<td style="text-align: center;">
+Height
+</td>
+<td style="text-align: center;">
+57.34 (3.48)
+</td>
+<td style="text-align: center;">
+57.27 (3.28)
+</td>
+<td style="text-align: center;">
+-0.83
+</td>
+<td style="text-align: center;">
+.41
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+-0.02
+</td>
 </tr>
 <tr>
-<td style='border-bottom: 2px solid grey; text-align: center;'>depressT</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>55.1 (5.27)</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>55.88 (6.01)</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>4.87</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'><.001</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>***</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>0.14</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+depressT
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+55.1 (5.27)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+55.88 (6.01)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+4.87
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+&lt;.001
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+***
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+0.14
+</td>
 </tr>
 </tbody>
-<tr><td colspan='7' style='text-align: left;'>
-Note. N=4 excluded for missing group variable. N=5 missing Height. N=4 missing depressT. * p<.05, ** p<.01, *** p<.001</td></tr>
+<tr>
+<td colspan="7" style="text-align: left;">
+Note. N=4 excluded for missing group variable. N=5 missing Height. N=4 missing depressT. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
 </table>
-
-<p>This can also be created for more than two groups. As with <code>correltable</code> variables can be renamed in the call.
-Also the significance stars can be moved to the statistic column or variable name (or removed). The p-value column can be removed as well (same for the effect size column, but why would you want to remove that?).</p>
-
-<pre><code class="r">FullTable1(data = psydat, vars = c(&quot;Age&quot;, &quot;Sex&quot;,&quot;Height&quot;, &quot;depressT&quot;), var_names = c(&quot;Age (months)&quot;, &quot;Sex&quot;,&quot;Height (inches)&quot;, &quot;Depression T&quot;), strata = &quot;Income&quot;, stars = &quot;stat&quot;,p_col = FALSE, html=TRUE)
-#&gt; Warning: N=404 missing/NA in grouping variable: Income
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<p>This can also be created for more than two groups. As with <code>correltable</code> variables can be renamed in the call. Also the significance stars can be moved to the statistic column or variable name (or removed). The p-value column can be removed as well (same for the effect size column, but why would you want to remove that?).</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">FullTable1</span>(<span class="dt">data =</span> psydat, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Sex&quot;</span>,<span class="st">&quot;Height&quot;</span>, <span class="st">&quot;depressT&quot;</span>), <span class="dt">var_names =</span> <span class="kw">c</span>(<span class="st">&quot;Age (months)&quot;</span>, <span class="st">&quot;Sex&quot;</span>,<span class="st">&quot;Height (inches)&quot;</span>, <span class="st">&quot;Depression T&quot;</span>), <span class="dt">strata =</span> <span class="st">&quot;Income&quot;</span>, <span class="dt">stars =</span> <span class="st">&quot;stat&quot;</span>,<span class="dt">p_col =</span> <span class="ot">FALSE</span>, <span class="dt">html=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="co">#&gt; Warning: N=404 missing/NA in grouping variable: Income</span></a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Variable</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>[<50K] (N=1331)</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>[>=100K] (N=1957)</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>[>=50K&<100K] (N=1308)</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Stat</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>es</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Variable
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+[&lt;50K] (N=1331)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+[&gt;=100K] (N=1957)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+[&gt;=50K&amp;&lt;100K] (N=1308)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Stat
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+es
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: center;'>Age (months)</td>
-<td style='text-align: center;'>120.61 (7.53)</td>
-<td style='text-align: center;'>121.23 (7.6)</td>
-<td style='text-align: center;'>120.55 (7.56)</td>
-<td style='text-align: center;'>F=4.17 *</td>
-<td style='text-align: center;'>η2=0.00</td>
+<td style="text-align: center;">
+Age (months)
+</td>
+<td style="text-align: center;">
+120.61 (7.53)
+</td>
+<td style="text-align: center;">
+121.23 (7.6)
+</td>
+<td style="text-align: center;">
+120.55 (7.56)
+</td>
+<td style="text-align: center;">
+F=4.17 *
+</td>
+<td style="text-align: center;">
+η2=0.00
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>Sex (M)</td>
-<td style='text-align: center;'>690 (51.88%)</td>
-<td style='text-align: center;'>1034 (52.86%)</td>
-<td style='text-align: center;'>700 (53.52%)</td>
-<td style='text-align: center;'>χ2=0.72 </td>
-<td style='text-align: center;'>V=0.01</td>
+<td style="text-align: center;">
+Sex (M)
+</td>
+<td style="text-align: center;">
+690 (51.88%)
+</td>
+<td style="text-align: center;">
+1034 (52.86%)
+</td>
+<td style="text-align: center;">
+700 (53.52%)
+</td>
+<td style="text-align: center;">
+χ2=0.72
+</td>
+<td style="text-align: center;">
+V=0.01
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>Height (inches)</td>
-<td style='text-align: center;'>57.42 (3.49)</td>
-<td style='text-align: center;'>57.29 (3.25)</td>
-<td style='text-align: center;'>57.23 (3.25)</td>
-<td style='text-align: center;'>F=1.15 </td>
-<td style='text-align: center;'>η2=0.00</td>
+<td style="text-align: center;">
+Height (inches)
+</td>
+<td style="text-align: center;">
+57.42 (3.49)
+</td>
+<td style="text-align: center;">
+57.29 (3.25)
+</td>
+<td style="text-align: center;">
+57.23 (3.25)
+</td>
+<td style="text-align: center;">
+F=1.15
+</td>
+<td style="text-align: center;">
+η2=0.00
+</td>
 </tr>
 <tr>
-<td style='border-bottom: 2px solid grey; text-align: center;'>Depression T</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>56.4 (6.56)</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>54.83 (4.9)</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>55.63 (5.72)</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>F=31.18 ***</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>η2=0.01</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+Depression T
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+56.4 (6.56)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+54.83 (4.9)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+55.63 (5.72)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+F=31.18 ***
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+η2=0.01
+</td>
 </tr>
 </tbody>
-<tr><td colspan='6' style='text-align: left;'>
-Note. N=404 excluded for missing group variable. N=2 missing Sex. N=5 missing Height (inches). N=4 missing Depression T. * p<.05, ** p<.01, *** p<.001</td></tr>
+<tr>
+<td colspan="6" style="text-align: left;">
+Note. N=404 excluded for missing group variable. N=2 missing Sex. N=5 missing Height (inches). N=4 missing Depression T. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
 </table>
-
-<p>All variables will be summarized if none are declared
-Shown with significance stars on variable names.</p>
-
-<pre><code class="r">FullTable1(data = psydat, strata = &quot;Sex&quot;,stars = &quot;name&quot;,p_col = FALSE, html=TRUE)
-#&gt; Warning: N=4 missing/NA in grouping variable: Sex
-</code></pre>
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+<p>All variables will be summarized if none are declared Shown with significance stars on variable names.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">FullTable1</span>(<span class="dt">data =</span> psydat, <span class="dt">strata =</span> <span class="st">&quot;Sex&quot;</span>,<span class="dt">stars =</span> <span class="st">&quot;name&quot;</span>,<span class="dt">p_col =</span> <span class="ot">FALSE</span>, <span class="dt">html=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="co">#&gt; Warning: N=4 missing/NA in grouping variable: Sex</span></a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
 <thead>
 <tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Variable</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>F (N=2364)</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>M (N=2632)</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Stat</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>es</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Variable
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+F (N=2364)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+M (N=2632)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Stat
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+es
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style='text-align: center;'>Age </td>
-<td style='text-align: center;'>120.65 (7.5)</td>
-<td style='text-align: center;'>121.05 (7.66)</td>
-<td style='text-align: center;'>t=1.86</td>
-<td style='text-align: center;'>d=0.05</td>
+<td style="text-align: center;">
+Age
+</td>
+<td style="text-align: center;">
+120.65 (7.5)
+</td>
+<td style="text-align: center;">
+121.05 (7.66)
+</td>
+<td style="text-align: center;">
+t=1.86
+</td>
+<td style="text-align: center;">
+d=0.05
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>Income </td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'>χ2=0.72</td>
-<td style='text-align: center;'>V=0.01</td>
+<td style="text-align: center;">
+Income
+</td>
+<td style="text-align: center;">
+-
+</td>
+<td style="text-align: center;">
+-
+</td>
+<td style="text-align: center;">
+χ2=0.72
+</td>
+<td style="text-align: center;">
+V=0.01
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>[<50K] NA</td>
-<td style='text-align: center;'>640 (29.49%)</td>
-<td style='text-align: center;'>690 (28.47%)</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
+<td style="text-align: center;">
+[&lt;50K] NA
+</td>
+<td style="text-align: center;">
+640 (29.49%)
+</td>
+<td style="text-align: center;">
+690 (28.47%)
+</td>
+<td style="text-align: center;">
+-
+</td>
+<td style="text-align: center;">
+-
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>[>=100K] NA</td>
-<td style='text-align: center;'>922 (42.49%)</td>
-<td style='text-align: center;'>1034 (42.66%)</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
+<td style="text-align: center;">
+[&gt;=100K] NA
+</td>
+<td style="text-align: center;">
+922 (42.49%)
+</td>
+<td style="text-align: center;">
+1034 (42.66%)
+</td>
+<td style="text-align: center;">
+-
+</td>
+<td style="text-align: center;">
+-
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>[>=50K&<100K] NA</td>
-<td style='text-align: center;'>608 (28.02%)</td>
-<td style='text-align: center;'>700 (28.88%)</td>
-<td style='text-align: center;'></td>
-<td style='text-align: center;'></td>
+<td style="text-align: center;">
+[&gt;=50K&amp;&lt;100K] NA
+</td>
+<td style="text-align: center;">
+608 (28.02%)
+</td>
+<td style="text-align: center;">
+700 (28.88%)
+</td>
+<td style="text-align: center;">
+-
+</td>
+<td style="text-align: center;">
+-
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>Height </td>
-<td style='text-align: center;'>57.34 (3.48)</td>
-<td style='text-align: center;'>57.27 (3.28)</td>
-<td style='text-align: center;'>t=-0.83</td>
-<td style='text-align: center;'>d=-0.02</td>
+<td style="text-align: center;">
+Height
+</td>
+<td style="text-align: center;">
+57.34 (3.48)
+</td>
+<td style="text-align: center;">
+57.27 (3.28)
+</td>
+<td style="text-align: center;">
+t=-0.83
+</td>
+<td style="text-align: center;">
+d=-0.02
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>iq </td>
-<td style='text-align: center;'>103.04 (18.04)</td>
-<td style='text-align: center;'>102.39 (18.01)</td>
-<td style='text-align: center;'>t=-1.25</td>
-<td style='text-align: center;'>d=-0.04</td>
+<td style="text-align: center;">
+iq
+</td>
+<td style="text-align: center;">
+103.04 (18.04)
+</td>
+<td style="text-align: center;">
+102.39 (18.01)
+</td>
+<td style="text-align: center;">
+t=-1.25
+</td>
+<td style="text-align: center;">
+d=-0.04
+</td>
 </tr>
 <tr>
-<td style='text-align: center;'>depressT ***</td>
-<td style='text-align: center;'>55.1 (5.27)</td>
-<td style='text-align: center;'>55.88 (6.01)</td>
-<td style='text-align: center;'>t=4.87</td>
-<td style='text-align: center;'>d=0.14</td>
+<td style="text-align: center;">
+depressT ***
+</td>
+<td style="text-align: center;">
+55.1 (5.27)
+</td>
+<td style="text-align: center;">
+55.88 (6.01)
+</td>
+<td style="text-align: center;">
+t=4.87
+</td>
+<td style="text-align: center;">
+d=0.14
+</td>
 </tr>
 <tr>
-<td style='border-bottom: 2px solid grey; text-align: center;'>anxT ***</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>55.06 (5.96)</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>56.08 (6.53)</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>t=5.76</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>d=0.16</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+anxT ***
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+55.06 (5.96)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+56.08 (6.53)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+t=5.76
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+d=0.16
+</td>
 </tr>
 </tbody>
-<tr><td colspan='5' style='text-align: left;'>
-Note. N=4 excluded for missing group variable. N=402 missing Income. N=5 missing Height. N=177 missing iq. N=4 missing depressT. N=4 missing anxT. * p<.05, ** p<.01, *** p<.001</td></tr>
+<tr>
+<td colspan="5" style="text-align: left;">
+Note. N=4 excluded for missing group variable. N=402 missing Income. N=5 missing Height. N=177 missing iq. N=4 missing depressT. N=4 missing anxT. * p&lt;.05, ** p&lt;.01, *** p&lt;.001
+</td>
+</tr>
 </table>
-
-<hr/>
-
+<p>You can also replace the caption with your own input and re-output to HTML.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">FullTable1</span>(<span class="dt">data =</span> psydat,</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">   <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Height&quot;</span>, <span class="st">&quot;depressT&quot;</span>), <span class="dt">strata =</span> <span class="st">&quot;Sex&quot;</span>)</a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt; Warning: N=4 missing/NA in grouping variable: Sex</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4">   tmp<span class="op">$</span>caption &lt;-<span class="st"> &quot;Write your own caption&quot;</span></a>
+<a class="sourceLine" id="cb18-5" data-line-number="5">   <span class="kw">print</span>(htmlTable<span class="op">::</span><span class="kw">htmlTable</span>(tmp<span class="op">$</span>table, <span class="dt">useViewer=</span>T, <span class="dt">rnames=</span>F,<span class="dt">caption=</span>tmp<span class="op">$</span>caption, <span class="dt">pos.caption=</span><span class="st">&quot;bottom&quot;</span>))</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<thead>
+<tr>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Variable
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+F (N=2364)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+M (N=2632)
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+Stat
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+p
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+sig
+</th>
+<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+es
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">
+Age
+</td>
+<td style="text-align: center;">
+120.65 (7.5)
+</td>
+<td style="text-align: center;">
+121.05 (7.66)
+</td>
+<td style="text-align: center;">
+1.86
+</td>
+<td style="text-align: center;">
+.06
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+Height
+</td>
+<td style="text-align: center;">
+57.34 (3.48)
+</td>
+<td style="text-align: center;">
+57.27 (3.28)
+</td>
+<td style="text-align: center;">
+-0.83
+</td>
+<td style="text-align: center;">
+.41
+</td>
+<td style="text-align: center;">
+</td>
+<td style="text-align: center;">
+-0.02
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+depressT
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+55.1 (5.27)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+55.88 (6.01)
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+4.87
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+&lt;.001
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+***
+</td>
+<td style="border-bottom: 2px solid grey; text-align: center;">
+0.14
+</td>
+</tr>
+</tbody>
+<tr>
+<td colspan="7" style="text-align: left;">
+Write your own caption
+</td>
+</tr>
+</table>
+<hr />
+</div>
+<div id="winsorizing" class="section level2">
 <h2>Winsorizing</h2>
+<p>The <code>winsorZ</code> function allows for Winsorizing outliers based on a Z-score cutoff, i.e. replacing extreme values with the next most extreme outlier value. This is an alternative to other function, e.g. <code>DescTools::Winsorize</code> which identifies outlier based on quantile limits. The <code>winsorZ</code> function can be used in combination with the <code>winsorZ_find</code> function, which identifies the outlier values (1=outlier, 0=non-outlier).</p>
+<p>For example, in the example data, psydat$iq has 17 outliers that exceed a default |Z|&gt;3 limit test. Here, we create a temporary data frame with the original iq scores, the Z-score winsorized iq values, and an indication of which scores were winsorized. We can see the change in mix/max iq values in the summary and the winsorized outliers are shown in blue in the plot.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">temp &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">iq=</span>psydat<span class="op">$</span>iq, <span class="dt">iq_winsor=</span><span class="kw">winsorZ</span>(psydat<span class="op">$</span>iq), <span class="dt">iq_outlier =</span> <span class="kw">winsorZ_find</span>(psydat<span class="op">$</span>iq))</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="kw">summary</span>(temp)</a></code></pre></div>
+<pre><code>   iq           iq_winsor      iq_outlier </code></pre>
+<p>Min. : 34.86 Min. : 48.74 0 :4804<br />
+1st Qu.: 90.58 1st Qu.: 90.58 1 : 17<br />
+Median :101.96 Median :101.96 NA’s: 179<br />
+Mean :102.70 Mean :102.64<br />
+3rd Qu.:113.86 3rd Qu.:113.86<br />
+Max. :222.99 Max. :156.12<br />
+NA’s :179 NA’s :179</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">ggplot</span>(temp[<span class="op">!</span><span class="kw">is.na</span>(temp<span class="op">$</span>iq),], <span class="kw">aes</span>(<span class="dt">x=</span>iq, <span class="dt">y=</span>iq_winsor)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">color=</span>iq_outlier),<span class="dt">alpha=</span>.<span class="dv">7</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
 
-<p>The <code>winsorZ</code> function allows for Winsorizing outliers based on a Z-score cutoff, i.e.
-  replacing extreme values with the next most extreme outlier value.
-This is an alternative to other function, e.g. <code>DescTools::Winsorize</code> which
-  identifies outlier based on quantile limits.
-The <code>winsorZ</code> function can be used in combination with the <code>winsorZ_find</code> function,
-  which identifies the outlier values (1=outlier, 0=non-outlier).</p>
 
-<p>For example, in the example data, psydat$iq has 17 outliers that exceed a default
-|Z|&gt;3 limit test. Here, we create a temporary data frame with the original
-iq scores, the Z-score winsorized iq values, and an indication of which scores
-were winsorized. We can see the change in mix/max iq values in the summary
-and the winsorized outliers are shown in blue in the plot.</p>
 
-<pre><code class="r">temp &lt;- data.frame(iq=psydat$iq, iq_winsor=winsorZ(psydat$iq), iq_outlier = winsorZ_find(psydat$iq))
-summary(temp)
-</code></pre>
+<!-- code folding -->
 
-<pre><code>   iq           iq_winsor      iq_outlier 
-</code></pre>
 
-<p>Min.   : 34.86   Min.   : 48.74   0   :4804<br/>
- 1st Qu.: 90.58   1st Qu.: 90.58   1   :  17<br/>
- Median :101.96   Median :101.96   NA&#39;s: 179<br/>
- Mean   :102.70   Mean   :102.64<br/>
- 3rd Qu.:113.86   3rd Qu.:113.86<br/>
- Max.   :222.99   Max.   :156.12<br/>
- NA&#39;s   :179      NA&#39;s   :179                 </p>
-
-<pre><code class="r">ggplot(temp[!is.na(temp$iq),], aes(x=iq, y=iq_winsor)) + geom_point(aes(color=iq_outlier),alpha=.7) + geom_line() + theme_bw()
-</code></pre>
-
-<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-15"/></p>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 
 </body>
-
 </html>
