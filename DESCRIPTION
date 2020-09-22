@@ -1,6 +1,6 @@
 Package: scipub
 Title: Summarize Data for Scientific Publication
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: 
     person(given = "David",
            family = "Pagliaccio",
@@ -17,19 +17,19 @@ Description: Create and format tables and APA statistics for
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Language: en-US
 VignetteBuilder: knitr
 URL: https://github.com/dpagliaccio/scipub,
         https://dpagliaccio.github.io/scipub/
 BugReports: https://github.com/dpagliaccio/scipub/issues
 Depends: R (>= 3.6)
-Imports: dplyr, forcats, purrr, stats, stringr, tibble, tidyr,
-        tidyselect
-Suggests: spelling, ggplot2, htmlTable, knitr, rmarkdown
+Imports: dplyr, forcats, ggplot2, gghalves, purrr, stats, stringr,
+        tibble, tidyr, tidyselect
+Suggests: spelling, htmlTable, knitr, rmarkdown
 NeedsCompilation: no
-Packaged: 2020-06-03 23:32:27 UTC; david
+Packaged: 2020-09-21 23:34:57 UTC; david
 Author: David Pagliaccio [aut, cre] (<https://orcid.org/0000-0002-1214-1965>)
 Maintainer: David Pagliaccio <david.pagliaccio@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-06-04 06:40:02 UTC
+Date/Publication: 2020-09-22 04:40:02 UTC
