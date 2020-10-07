@@ -1,6 +1,6 @@
-# scipub 1.0.0
+# scipub 1.2.1
 
-* Added a `NEWS.md` file to track changes to the package.
+* fixed gg_grouplot function
 
 # scipub 1.2.0
 
@@ -16,4 +16,9 @@
   patients but not for a healthy group
 * fixed cutempty behavior for correltable
 * fixed output behavior for apastat
+
+# scipub 1.0.0
+
+* Added a `NEWS.md` file to track changes to the package.
+
 

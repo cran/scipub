@@ -40,6 +40,8 @@ gg_groupplot <- function(data, x = NULL, y = NULL,
   stop("please declare y variable", call. = FALSE)
  }
 
+  data <- as.data.frame(data)
+
  data[, x] <- as.factor(data[, x])
  data[, y] <- as.numeric(as.character((data[, y])))
 
