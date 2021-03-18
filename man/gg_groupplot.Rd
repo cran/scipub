@@ -4,14 +4,14 @@
 \alias{gg_groupplot}
 \title{Create ggplot to display group differences (box+point+hist)}
 \usage{
-gg_groupplot(data, x = NULL, y = NULL, meanline = c(TRUE, FALSE))
+gg_groupplot(data, x, y, meanline = c(TRUE, FALSE))
 }
 \arguments{
 \item{data}{The input dataset.}
 
-\item{x}{The grouping factor, e.g. "Sex".}
+\item{x}{The grouping factor, e.g. Sex}
 
-\item{y}{The numeric outcome variable, e.g. "Age"}
+\item{y}{The numeric outcome variable, e.g. Age}
 
 \item{meanline}{Optional indicator of means}
 }
@@ -38,6 +38,6 @@ This function will drop any NA values.
 Requires \code{ggplot2} and \code{gghalves} libraries.
 }
 \examples{
-gg_groupplot(data = psydat, x = "Sex", y = "depressT", meanline = TRUE)
+gg_groupplot(data = psydat, x = Sex, y = depressT, meanline = TRUE)
 
 }

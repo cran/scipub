@@ -1,6 +1,6 @@
 Package: scipub
 Title: Summarize Data for Scientific Publication
-Version: 1.2.1
+Version: 1.2.2
 Authors@R: 
     person(given = "David",
            family = "Pagliaccio",
@@ -28,8 +28,8 @@ Imports: dplyr, forcats, ggplot2, gghalves, purrr, stats, stringr,
         tibble, tidyr, tidyselect
 Suggests: spelling, htmlTable, knitr, rmarkdown
 NeedsCompilation: no
-Packaged: 2020-10-07 14:39:27 UTC; david
+Packaged: 2021-03-18 01:01:05 UTC; david
 Author: David Pagliaccio [aut, cre] (<https://orcid.org/0000-0002-1214-1965>)
 Maintainer: David Pagliaccio <david.pagliaccio@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-10-07 16:00:02 UTC
+Date/Publication: 2021-03-18 05:50:02 UTC

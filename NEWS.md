@@ -1,3 +1,11 @@
+# scipub 1.2.2
+
+* updated gg_grouplot to take bare unquoted input variables
+* added option to split correltable by strata variable,
+  this allows for testting across a 2-level variable
+  where values are presented for level1 in the upper and
+  level2 in the lower triangle of the output matrix
+
 # scipub 1.2.1
 
 * fixed gg_grouplot function

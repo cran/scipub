@@ -45,6 +45,9 @@
 #'   default=FALSE, if TRUE overrides cutempty.
 #' @param html Format as html in viewer or not (default=F, print in console),
 #'  needs library(htmlTable) installed.
+#' @param strata Split table by a 2-level factor variable
+#'  with level1 in the upper and level2 in the lower triangle
+#'  must have 2+ cases per level, cannot be combined with vars2
 #' @return Output Table 1
 #' @import 	dplyr
 #' @importFrom 	forcats fct_relevel
@@ -58,6 +61,10 @@
 #' correltable(
 #'   data = psydat, vars = c("Age", "Height", "iq"),
 #'   tri = "lower", html = TRUE
+#' )
+#' correltable(
+#'   data = psydat, vars = c("Age", "Height", "iq"),
+#'   tri = "lower", html = TRUE, strata = "Sex"
 #' )
 #' correltable(
 #'   data = psydat, vars = c("Age", "Height", "iq"),
@@ -78,7 +85,8 @@ correltable <- function(data, vars = NULL, var_names = vars,
                         tri = c("upper", "lower", "all"),
                         cutempty = c(FALSE, TRUE),
                         colnum = c(FALSE, TRUE),
-                        html = c(FALSE, TRUE)) {
+                        html = c(FALSE, TRUE),
+                        strata = NULL) {
   # remove duplicates
   var_names <- var_names[!duplicated(vars)]
   vars <- vars[!duplicated(vars)]
@@ -106,7 +114,21 @@ correltable <- function(data, vars = NULL, var_names = vars,
     stop("length of var_names2 does not match length of vars2", call. = FALSE)
   }
 
-
+  #check strata
+  if (!is.null(strata)) {
+    if (length(levels(factor(data[,strata])))!=2) {
+      stop("strata variable must have 2 levels", call. = FALSE)
+    }
+    if (strata %in% varsall) {
+      stop("strata variable should not also be in the variables list", call. = FALSE)
+    }
+    if (min(table(factor(data[,strata]))) < 2 ) {
+      stop("all levels of strata variable must have more than 2 cases", call. = FALSE)
+    }
+    if (!is.null(vars2)) {
+      stop("cannot combine strata and vars2", call. = FALSE)
+    }
+  }
 
 
   # select data
@@ -116,6 +138,7 @@ correltable <- function(data, vars = NULL, var_names = vars,
   if (stringr::str_detect(use[1], "complete")) {
     miss <- NROW(x[!complete.cases(x), ])
     x <- x[complete.cases(x), ]
+    data <- data[complete.cases(x), ]
   }
 
   # #check for non-numeric and convert with warning...
@@ -123,8 +146,8 @@ correltable <- function(data, vars = NULL, var_names = vars,
     warning(paste0(
       "Converting non-numeric columns to factor: ",
       stringr::str_c(colnames(x %>%
-        dplyr::select_if(purrr::negate(is.numeric))),
-      sep = " ", collapse = ","
+                                dplyr::select_if(purrr::negate(is.numeric))),
+                     sep = " ", collapse = ","
       )
     ), call. = FALSE)
 
@@ -139,13 +162,13 @@ correltable <- function(data, vars = NULL, var_names = vars,
       dplyr::mutate_if(purrr::negate(is.numeric), factor, ordered = FALSE)
 
     factortwo <- names(f %>%
-      dplyr::select_if(function(col) {
-        dplyr::n_distinct(col, na.rm = TRUE) == 2
-      }))
+                         dplyr::select_if(function(col) {
+                           dplyr::n_distinct(col, na.rm = TRUE) == 2
+                         }))
     factormore <- names(f %>%
-      dplyr::select_if(function(col) {
-        dplyr::n_distinct(col, na.rm = TRUE) > 2
-      }))
+                          dplyr::select_if(function(col) {
+                            dplyr::n_distinct(col, na.rm = TRUE) > 2
+                          }))
 
     x[, factorvars] <- 1
   } else {
@@ -154,241 +177,253 @@ correltable <- function(data, vars = NULL, var_names = vars,
   }
 
 
+  doall <- function(x,tri,cutempty) {
 
-  # correlate numeric
-  r <- suppressWarnings(stats::cor(x, use = use[1], method = method[1]))
-  # get n
-  n <- t(!is.na(x)) %*% (!is.na(x))
-  # calc t-stat
-  t <- (r * sqrt(n - 2)) / sqrt(1 - r^2)
-  # calc p-value
-  p <- -2 * expm1(pt(abs(t), (n - 2), log.p = TRUE))
-  p[p > 1] <- 1
+    # correlate numeric
+    r <- suppressWarnings(stats::cor(x, use = use[1], method = method[1]))
+    # get n
+    n <- t(!is.na(x)) %*% (!is.na(x))
+    # calc t-stat
+    t <- (r * sqrt(n - 2)) / sqrt(1 - r^2)
+    # calc p-value
+    p <- -2 * expm1(pt(abs(t), (n - 2), log.p = TRUE))
+    p[p > 1] <- 1
 
 
-  # round, format, and add stars
-  rmat <- matrix(paste(sub(
-    x = format(round(r, round_n), round_n),
-    pattern = "0.", replacement = "."
-  ),
-  ifelse(p < .001,
-    "***",
-    ifelse(p < .01,
-      "**",
-      ifelse(p < .05,
-        "*",
-        ""
-      )
+    # round, format, and add stars
+    rmat <- matrix(paste(sub(
+      x = format(round(r, round_n), round_n),
+      pattern = "0.", replacement = "."
+    ),
+    ifelse(p < .001,
+           "***",
+           ifelse(p < .01,
+                  "**",
+                  ifelse(p < .05,
+                         "*",
+                         ""
+                  )
+           )
+    ),
+    sep = ""
+    ),
+    nrow = ncol(x), ncol = ncol(x)
     )
-  ),
-  sep = ""
-  ),
-  nrow = ncol(x), ncol = ncol(x)
-  )
 
-  #  if factor variables exist do t/F/chi
-  if (!is.null(factorvars)) {
+    #  if factor variables exist do t/F/chi
+    if (!is.null(factorvars)) {
 
-    # merge from rmat above
-    mergemat <- as.data.frame(rmat,
-      row.names = varsall, stringsAsFactors = FALSE
-    )
-    colnames(mergemat) <- varsall
-
-
-    # if 2 level factors - do t-test
-    if (!is.null(factortwo) & !is.null(numvars)) {
-
-      tmpt <- mapply(
-        function(n, f) {
-          paste0(
-            "t=",
-            format(round(t.test(get(n) ~ get(f),
-              data = orig,
-              na.action = na.omit
-            )$statistic, round_n), round_n)
-          )
-        },
-        rep(numvars, length(factortwo)),
-        rep(factortwo, each = length(numvars))
+      # merge from rmat above
+      mergemat <- as.data.frame(rmat,
+                                row.names = varsall, stringsAsFactors = FALSE
       )
-      tmpp <- mapply(
-        function(n, f) {
-          t.test(get(n) ~ get(f),
-            data = orig
-          )$p.value
-        },
-        rep(numvars, length(factortwo)),
-        rep(factortwo, each = length(numvars))
-      )
-      tmat <- matrix(paste(tmpt, ifelse(tmpp < .001,
-        "***",
-        ifelse(tmpp < .01,
-          "**",
-          ifelse(tmpp < .05,
-            "*",
-            ""
-          )
-        )
-      ), sep = ""),
-      nrow = length(numvars), ncol = length(factortwo)
-      )
-      mergetmat <- as.data.frame(tmat,
-                                 row.names = numvars, stringsAsFactors = FALSE
-      )
-      colnames(mergetmat) <- factortwo
-      #rownames(mergetmat) <- numvars
-
-      mergemat[numvars, factortwo] <- mergetmat[numvars, factortwo]
-      mergemat[factortwo, numvars] <- t(mergetmat[numvars, factortwo])
-    }
+      colnames(mergemat) <- varsall
 
 
+      # if 2 level factors - do t-test
+      if (!is.null(factortwo) & !is.null(numvars)) {
 
-    # if 3+ level factors - do aov
-    if (!is.null(factormore) & !is.null(numvars)) {
-      fmat <- mapply(
-        function(n, f) {
-          paste0(
-            "F=",
-            format(
-              round(summary(stats::aov(get(n) ~ get(f),
-                data = orig,
-                na.action = na.omit
-              ))[[1]]$"F value"[1], round_n),
-              round_n
+        tmpt <- mapply(
+          function(n, f) {
+            paste0(
+              "t=",
+              format(round(t.test(get(n) ~ get(f),
+                                  data = orig,
+                                  na.action = na.omit
+              )$statistic, round_n), round_n)
             )
-          )
-        },
-        rep(numvars, length(factormore)),
-        rep(factormore, each = length(numvars))
-      )
-      fmatp <- mapply(
-        function(n, f) {
-          summary(stats::aov(get(n) ~ get(f), data = orig))[[1]]$"Pr(>F)"[1]
-        },
-        rep(numvars, length(factormore)),
-        rep(factormore, each = length(numvars))
-      )
-
-      fmat <- matrix(paste(fmat, ifelse(fmatp < .001,
-        "***",
-        ifelse(fmatp < .01,
-          "**",
-          ifelse(fmatp < .05,
-            "*",
-            ""
-          )
+          },
+          rep(numvars, length(factortwo)),
+          rep(factortwo, each = length(numvars))
         )
-      ), sep = ""),
-      ncol = length(numvars), nrow = length(factormore)
-      )
-      mergefmat <- as.data.frame(fmat,
-        row.names = factormore, stringsAsFactors = FALSE
-      )
-      colnames(mergefmat) <- numvars
+        tmpp <- mapply(
+          function(n, f) {
+            t.test(get(n) ~ get(f),
+                   data = orig
+            )$p.value
+          },
+          rep(numvars, length(factortwo)),
+          rep(factortwo, each = length(numvars))
+        )
+        tmat <- matrix(paste(tmpt, ifelse(tmpp < .001,
+                                          "***",
+                                          ifelse(tmpp < .01,
+                                                 "**",
+                                                 ifelse(tmpp < .05,
+                                                        "*",
+                                                        ""
+                                                 )
+                                          )
+        ), sep = ""),
+        nrow = length(numvars), ncol = length(factortwo)
+        )
+        mergetmat <- as.data.frame(tmat,
+                                   row.names = numvars, stringsAsFactors = FALSE
+        )
+        colnames(mergetmat) <- factortwo
+        #rownames(mergetmat) <- numvars
 
-      mergemat[factormore, numvars] <- mergefmat[factormore, numvars]
-      mergemat[numvars, factormore] <- t(mergefmat[factormore, numvars])
+        mergemat[numvars, factortwo] <- mergetmat[numvars, factortwo]
+        mergemat[factortwo, numvars] <- t(mergetmat[numvars, factortwo])
+      }
+
+
+
+      # if 3+ level factors - do aov
+      if (!is.null(factormore) & !is.null(numvars)) {
+        fmat <- mapply(
+          function(n, f) {
+            paste0(
+              "F=",
+              format(
+                round(summary(stats::aov(get(n) ~ get(f),
+                                         data = orig,
+                                         na.action = na.omit
+                ))[[1]]$"F value"[1], round_n),
+                round_n
+              )
+            )
+          },
+          rep(numvars, length(factormore)),
+          rep(factormore, each = length(numvars))
+        )
+        fmatp <- mapply(
+          function(n, f) {
+            summary(stats::aov(get(n) ~ get(f), data = orig))[[1]]$"Pr(>F)"[1]
+          },
+          rep(numvars, length(factormore)),
+          rep(factormore, each = length(numvars))
+        )
+
+        fmat <- matrix(paste(fmat, ifelse(fmatp < .001,
+                                          "***",
+                                          ifelse(fmatp < .01,
+                                                 "**",
+                                                 ifelse(fmatp < .05,
+                                                        "*",
+                                                        ""
+                                                 )
+                                          )
+        ), sep = ""),
+        ncol = length(numvars), nrow = length(factormore)
+        )
+        mergefmat <- as.data.frame(fmat,
+                                   row.names = factormore, stringsAsFactors = FALSE
+        )
+        colnames(mergefmat) <- numvars
+
+        mergemat[factormore, numvars] <- mergefmat[factormore, numvars]
+        mergemat[numvars, factormore] <- t(mergefmat[factormore, numvars])
+      }
+
+
+      # if more than one factor var, test chi2
+      if (length(factorvars) > 1) {
+        chix <- mapply(
+          function(n1, n2) {
+            paste0(
+              "\u03C7", "2=",
+              format(round(stats::chisq.test(
+                orig[[n1]],
+                orig[[n2]]
+              )$statistic, round_n), round_n)
+            )
+          },
+          rep(factorvars, length(factorvars)),
+          rep(factorvars, each = length(factorvars))
+        )
+        chip <- mapply(
+          function(n1, n2) {
+            stats::chisq.test(orig[[n1]], orig[[n2]])$p.value
+          },
+          rep(factorvars, length(factorvars)),
+          rep(factorvars, each = length(factorvars))
+        )
+
+        chix <- matrix(paste(chix, ifelse(chip < .001,
+                                          "***",
+                                          ifelse(chip < .01,
+                                                 "**",
+                                                 ifelse(chip < .05,
+                                                        "*",
+                                                        ""
+                                                 )
+                                          )
+        ), sep = ""),
+        ncol = length(factorvars), nrow = length(factorvars)
+        )
+
+
+        mergechi <- as.data.frame(chix,
+                                  row.names = factorvars, stringsAsFactors = FALSE
+        )
+        colnames(mergechi) <- factorvars
+
+        mergemat[factorvars, factorvars] <- mergechi
+      }
+
+
+      # convert back to matrix
+      rmat <- as.matrix(mergemat)
     }
 
 
-    # if more than one factor var, test chi2
-    if (length(factorvars) > 1) {
-      chix <- mapply(
-        function(n1, n2) {
-          paste0(
-            "\u03C7", "2=",
-            format(round(stats::chisq.test(
-              orig[[n1]],
-              orig[[n2]]
-            )$statistic, round_n), round_n)
-          )
-        },
-        rep(factorvars, length(factorvars)),
-        rep(factorvars, each = length(factorvars))
-      )
-      chip <- mapply(
-        function(n1, n2) {
-          stats::chisq.test(orig[[n1]], orig[[n2]])$p.value
-        },
-        rep(factorvars, length(factorvars)),
-        rep(factorvars, each = length(factorvars))
-      )
-
-      chix <- matrix(paste(chix, ifelse(chip < .001,
-        "***",
-        ifelse(chip < .01,
-          "**",
-          ifelse(chip < .05,
-            "*",
-            ""
-          )
-        )
-      ), sep = ""),
-      ncol = length(factorvars), nrow = length(factorvars)
-      )
 
 
-      mergechi <- as.data.frame(chix,
-        row.names = factorvars, stringsAsFactors = FALSE
-      )
-      colnames(mergechi) <- factorvars
+    # remove diagonal
+    diag(rmat) <- "-"
 
-      mergemat[factorvars, factorvars] <- mergechi
+
+
+    # if vars2 supplied - override other...
+    if (!is.null(vars2)) {
+      colnum <- FALSE
+      cutempty <- FALSE
+      tri <- "all"
     }
 
 
-    # convert back to matrix
-    rmat <- as.matrix(mergemat)
+
+
+
+    # rename
+    if (colnum[1]) {
+      rownames(rmat) <- paste(seq_len(length(varsall)), var_namesall, sep = ". ")
+      colnames(rmat) <- seq_len(length(varsall))
+    } else {
+      rownames(rmat) <- var_namesall
+      colnames(rmat) <- var_namesall
+    }
+
+
+    ## pick upper/lower triangle of correlation matrix to keep
+    if (tri[1] == "upper") {
+      rmat[lower.tri(rmat, diag = TRUE)] <- ""
+      # & !colnum[1]
+      if (cutempty[1]) {
+        rmat <- rmat[-NROW(rmat), 2:ncol(rmat)]
+      }
+    }
+    if (tri[1] == "lower") {
+      rmat[upper.tri(rmat, diag = TRUE)] <- ""
+      if (cutempty[1]) {
+        rmat <- rmat[-1, -NCOL(rmat)]
+      }
+    }
+    # if vars2 supplied - cut to cross-correl
+    if (!is.null(vars2)) {
+      rmat <- rmat[seq_len(length(vars)), (length(vars) + 1):length(varsall)]
+    }
+
+    return(rmat)
   }
 
-
-
-
-  # remove diagonal
-  diag(rmat) <- "-"
-
-
-
-  # if vars2 supplied - override other...
-  if (!is.null(vars2)) {
-    colnum <- FALSE
-    cutempty <- FALSE
-    tri <- "all"
-  }
-
-
-
-
-
-  # rename
-  if (colnum[1]) {
-    rownames(rmat) <- paste(seq_len(length(varsall)), var_namesall, sep = ". ")
-    colnames(rmat) <- seq_len(length(varsall))
+  if (!is.null(strata)) {
+    rmat <-  doall(x[data[,strata]==levels(data[,strata])[1],],tri="upper",cutempty=FALSE)
+    rmatl <- doall(x[data[,strata]==levels(data[,strata])[2],],tri="lower",cutempty=FALSE)
+    rmat[lower.tri(rmat)] <- rmatl[lower.tri(rmatl)]
   } else {
-    rownames(rmat) <- var_namesall
-    colnames(rmat) <- var_namesall
-  }
-
-
-  ## pick upper/lower triangle of correlation matrix to keep
-  if (tri[1] == "upper") {
-    rmat[lower.tri(rmat, diag = TRUE)] <- ""
-    # & !colnum[1]
-    if (cutempty[1]) {
-      rmat <- rmat[-NROW(rmat), 2:ncol(rmat)]
-    }
-  }
-  if (tri[1] == "lower") {
-    rmat[upper.tri(rmat, diag = TRUE)] <- ""
-    if (cutempty[1]) {
-      rmat <- rmat[-1, -NCOL(rmat)]
-    }
-  }
-  # if vars2 supplied - cut to cross-correl
-  if (!is.null(vars2)) {
-    rmat <- rmat[seq_len(length(vars)), (length(vars) + 1):length(varsall)]
+    rmat <- doall(x,tri,cutempty)
   }
 
 
@@ -400,11 +435,11 @@ correltable <- function(data, vars = NULL, var_names = vars,
     dplyr::summarise_all(sum) %>%
     dplyr::select_if(function(sum) sum > 0)
   missingness <- ifelse(ncol(missing_n) > 0,
-    paste0(stringr::str_c(
-      "N=", missing_n,
-      " missing ", colnames(missing_n), ". "
-    ), collapse = ""),
-    ""
+                        paste0(stringr::str_c(
+                          "N=", missing_n,
+                          " missing ", colnames(missing_n), ". "
+                        ), collapse = ""),
+                        ""
   )
 
 
@@ -412,22 +447,26 @@ correltable <- function(data, vars = NULL, var_names = vars,
     "Note. This table presents ",
     stringr::str_to_title(method[1]), " correlation coefficients with ",
     ifelse(stringr::str_detect(use[1], "complete"),
-      paste0(
-        "list-wise deletion (N=",
-        NROW(x), ifelse(miss > 0,
-          paste0(", missing ", miss, " cases"), ""
-        ), ")"
-      ),
-      paste0("pairwise deletion. ", missingness)
+           paste0(
+             "list-wise deletion (N=",
+             NROW(x), ifelse(miss > 0,
+                             paste0(", missing ", miss, " cases"), ""
+             ), ")"
+           ),
+           paste0("pairwise deletion. ", missingness)
     ),
     ifelse(is.null(factorvars),
-      "",
-      paste0(" Group differences for continuous and categorical
+           "",
+           paste0(" Group differences for continuous and categorical
              variables are indicated by t-statistic/ANOVA F
              and chi-squared, respectively.")
     ),
-    " * p<.05, ** p<.01, *** p<.001"
-  )
+    ifelse(is.null(strata),
+           "",
+           paste0(" The data were split by ", strata,
+                  " (upper triangle = ", levels(data[,strata])[1],
+                  "; lower triangle = ", levels(data[,strata])[2],").")),
+    " * p<.05, ** p<.01, *** p<.001")
 
 
 
@@ -441,7 +480,7 @@ correltable <- function(data, vars = NULL, var_names = vars,
 
   if (html[1] == TRUE) {
     return(print(htmlTable::htmlTable(rmat,
-      useViewer = TRUE, caption = caption, pos.caption = "bottom"
+                                      useViewer = TRUE, caption = caption, pos.caption = "bottom"
     )))
   } else {
     return(list(table = noquote(rmat), caption = caption))

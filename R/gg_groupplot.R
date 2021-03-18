@@ -18,27 +18,29 @@
 #' This function will drop any NA values.
 #' Requires `ggplot2` and `gghalves` libraries.
 #' @param data The input dataset.
-#' @param x The grouping factor, e.g. "Sex".
-#' @param y The numeric outcome variable, e.g. "Age"
+#' @param x The grouping factor, e.g. Sex
+#' @param y The numeric outcome variable, e.g. Age
 #' @param meanline Optional indicator of means
 #' @return Output group plot
 #' @import 	ggplot2
 #' @import gghalves
 #' @export
 #' @examples
-#' gg_groupplot(data = psydat, x = "Sex", y = "depressT", meanline = TRUE)
+#' gg_groupplot(data = psydat, x = Sex, y = depressT, meanline = TRUE)
 #'
 
-gg_groupplot <- function(data, x = NULL, y = NULL,
+gg_groupplot <- function(data, x , y ,
             meanline = c(TRUE, FALSE)) {
 
 
- if (is.null(x)) {
+ if (missing(x)) {
   stop("please declare x variable", call. = FALSE)
  }
- if (is.null(y)) {
+ if (missing(y)) {
   stop("please declare y variable", call. = FALSE)
  }
+  x <- deparse(substitute(x))
+  y <- deparse(substitute(y))
 
   data <- as.data.frame(data)
 
@@ -48,7 +50,7 @@ gg_groupplot <- function(data, x = NULL, y = NULL,
  g <- ggplot(data = data[!is.na(data[, x]) & !is.na(data[, y]), ],
        aes(x = get(x), y = get(y),
            color = get(x), fill = get(x), shape = get(x))) +
-  geom_half_violin(position = position_nudge(x = .3, y = 0),
+   gghalves::geom_half_violin(position = position_nudge(x = .3, y = 0),
            alpha = .8, width = .5, side = "r", color = NA) +
   geom_point(position = position_jitterdodge(jitter.width = .5),
              alpha = .8, size = 1.5) +

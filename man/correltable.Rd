@@ -17,7 +17,8 @@ correltable(
   tri = c("upper", "lower", "all"),
   cutempty = c(FALSE, TRUE),
   colnum = c(FALSE, TRUE),
-  html = c(FALSE, TRUE)
+  html = c(FALSE, TRUE),
+  strata = NULL
 )
 }
 \arguments{
@@ -59,6 +60,10 @@ default=FALSE, if TRUE overrides cutempty.}
 
 \item{html}{Format as html in viewer or not (default=F, print in console),
 needs library(htmlTable) installed.}
+
+\item{strata}{Split table by a 2-level factor variable
+with level1 in the upper and level2 in the lower triangle
+must have 2+ cases per level, cannot be combined with vars2}
 }
 \value{
 Output Table 1
@@ -87,6 +92,10 @@ correltable(data = psydat)
 correltable(
   data = psydat, vars = c("Age", "Height", "iq"),
   tri = "lower", html = TRUE
+)
+correltable(
+  data = psydat, vars = c("Age", "Height", "iq"),
+  tri = "lower", html = TRUE, strata = "Sex"
 )
 correltable(
   data = psydat, vars = c("Age", "Height", "iq"),

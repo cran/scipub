@@ -71,8 +71,8 @@ summary(temp)
 ggplot(temp[!is.na(temp$iq),], aes(x=iq, y=iq_winsor)) + geom_point(aes(color=iq_outlier),alpha=.7) + geom_line() + theme_bw()
 
 ## ----results="asis"-----------------------------------------------------------
-gg_groupplot(data=psydat, x="Sex", y="depressT")
+gg_groupplot(data=psydat, x=Sex, y=depressT)
 
 ## ----results="asis"-----------------------------------------------------------
-gg_groupplot(data=psydat, x="Income", y="depressT") + facet_wrap(~Sex) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+gg_groupplot(data=psydat, x=Income, y=depressT) + facet_wrap(~Sex) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
